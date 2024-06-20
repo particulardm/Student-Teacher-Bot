@@ -1,5 +1,5 @@
 import { Bot, session } from 'grammy';
-import { MyContext, initial, askQuestions } from './src/session'
+import { MyContext, initial, askQuestions, handleCallbackQuery } from './src/session'
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -16,6 +16,10 @@ bot.command('start', (ctx) => {
 bot.on('message', (ctx) => {
     askQuestions(ctx, bot, targetChatID);
 })
+
+bot.on('callback_query:data', (ctx) => {
+    handleCallbackQuery(ctx);
+});
 
 bot.start();
 console.log('should be running...');

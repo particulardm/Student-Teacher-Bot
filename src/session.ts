@@ -1,4 +1,4 @@
-import { Bot, Context, SessionFlavor } from 'grammy';
+import { Bot, Context, SessionFlavor, InlineKeyboard } from 'grammy';
 
 interface SessionData {
     curStep: number;
@@ -29,11 +29,27 @@ let curStep = ctx.session.curStep;
             ctx.reply(questions[ctx.session.curStep]);
         }
         else {
-            ctx.reply('Thank you for your answers!! Updating the dashboard..');
+            ctx.reply("Thank you for your answers!! We will add them to the public dashboard after the moderator's approval.");
             const answers = ctx.session.answers;
+            const keyboard = new InlineKeyboard()
+                    .text("Approve", "approve")
+                    .text("Discard", "discard");
             bot.api.sendMessage(targetChatID, `${answers[0]}, ${answers[1]}, ${answers[2]}`);
+            bot.api.sendMessage(targetChatID, "Please approve or discard the answers:", { reply_markup: keyboard });
             ctx.session.curStep = 0;
             ctx.session.answers = [];
         }
     }
+    }
+
+    export function handleCallbackQuery(ctx: MyContext) {
+        if (ctx.update.callback_query) {
+            const action = ctx.update.callback_query.data;
+    
+            if (action === "approve") {
+                ctx.reply("The application approved, then. Adding them to the dashboard...");
+            } else if (action === "discard") {
+                ctx.reply("You've discarded this user's answers.");
+            }
+        }
     }
