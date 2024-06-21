@@ -18,7 +18,7 @@ bot.on('message', (ctx) => {
 })
 
 bot.on('callback_query:data', (ctx) => {
-    handleCallbackQuery(ctx);
+    handleCallbackQuery(ctx, bot);
 });
 
 bot.start();

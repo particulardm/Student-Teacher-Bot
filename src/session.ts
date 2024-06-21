@@ -31,9 +31,10 @@ let curStep = ctx.session.curStep;
         else {
             ctx.reply("Thank you for your answers!! We will add them to the public dashboard after the moderator's approval.");
             const answers = ctx.session.answers;
+            const answersUserID = ctx.chat?.id;
             const keyboard = new InlineKeyboard()
-                    .text("Approve", "approve")
-                    .text("Discard", "discard");
+                    .text("Approve", `approve:${answersUserID}`)
+                    .text("Discard", `discard:${answersUserID}`);
             bot.api.sendMessage(targetChatID, `${answers[0]}, ${answers[1]}, ${answers[2]}`);
             bot.api.sendMessage(targetChatID, "Please approve or discard the answers:", { reply_markup: keyboard });
             ctx.session.curStep = 0;
@@ -42,14 +43,18 @@ let curStep = ctx.session.curStep;
     }
     }
 
-    export function handleCallbackQuery(ctx: MyContext) {
-        if (ctx.update.callback_query) {
-            const action = ctx.update.callback_query.data;
+    export function handleCallbackQuery(ctx: MyContext, bot: Bot<MyContext>) {
+        if (ctx.update.callback_query?.data !== undefined) {
+            const data: string[] = ctx.update.callback_query.data.split(':');
+            const action = data[0];
+            const answersUserID = data[1];
     
             if (action === "approve") {
                 ctx.reply("The application approved, then. Adding them to the dashboard...");
+                bot.api.sendMessage(answersUserID, "Update: Congratulations!! Your application have been approved")
             } else if (action === "discard") {
                 ctx.reply("You've discarded this user's answers.");
+                bot.api.sendMessage(answersUserID, "Update: Your application have been discarded by a moderator. You can try again.")
             }
         }
     }
