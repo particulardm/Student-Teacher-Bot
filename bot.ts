@@ -22,4 +22,3 @@ bot.on('callback_query:data', (ctx) => {
 });
 
 bot.start();
-console.log('should be running...');
